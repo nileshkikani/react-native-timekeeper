@@ -1,6 +1,6 @@
 // @flow
-import * as React from 'react'
-import { Animated, Easing, StyleSheet, Text, View } from 'react-native'
+import * as React from "react";
+import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 
 // const ViewPropTypesStyle = ViewPropTypes
 //   ? ViewPropTypes.style
@@ -8,12 +8,12 @@ import { Animated, Easing, StyleSheet, Text, View } from 'react-native'
 
 const styles = StyleSheet.create({
   textBase: {
-    alignItems: 'center',
+    alignItems: "center",
     flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-})
+    flexDirection: "column",
+    justifyContent: "center"
+  }
+});
 
 type Props = {
   active: boolean,
@@ -23,8 +23,8 @@ type Props = {
   seconds: number,
   startAt: number,
   subTextStyle: Text.propTypes.style | Array<Text.propTypes.style>,
-  textStyle: Text.propTypes.style | Array<Text.propTypes.style>,
-}
+  textStyle: Text.propTypes.style | Array<Text.propTypes.style>
+};
 
 type Default = {
   active: boolean,
@@ -33,8 +33,8 @@ type Default = {
   seconds: number,
   startAT: number,
   subTextStyle: Text.propTypes.style | Array<Text.propTypes.style>,
-  textStyle: Text.propTypes.style | Array<Text.propTypes.style>,
-}
+  textStyle: Text.propTypes.style | Array<Text.propTypes.style>
+};
 
 type State = {
   active: boolean,
@@ -42,61 +42,65 @@ type State = {
   timeProgress: any,
   timeText: string,
   timeReverse: any,
-  time: any,
-}
+  time: any
+};
 
 const secondsToHms = (rd: number): string => {
-  const d = Number(rd)
+  const d = Number(rd);
   // const h = Math.floor(d / 3600);
-  const h = Math.floor(d / 60 / 60)
-  const m = Math.floor((d / 60) % 60)
-  const s = Math.floor(d % 60)
+  const h = Math.floor(d / 60 / 60);
+  const m = Math.floor((d / 60) % 60);
+  const s = Math.floor(d % 60);
   // const hDisplay = h > 0 ? h : '';
-  const mDisplay = m > 9 ? m : `0${m}`
-  const sDisplay = s > 9 ? s : `0${s}`
-  const hDisplay = h > 9 ? h : `0${h}`
-  return `${hDisplay}:${mDisplay}:${sDisplay}`
-}
+  const mDisplay = m > 9 ? m : `0${m}`;
+  const sDisplay = s > 9 ? s : `0${s}`;
+  const hDisplay = h > 9 ? h : `0${h}`;
+  return `${hDisplay}:${mDisplay}:${sDisplay}`;
+};
 
 export function getInitialStateText(props: Props): State {
-  const timeProgress = new Animated.Value(0)
+  const timeProgress = new Animated.Value(0);
   return {
     active: props.active,
     reverseCount: props.reverseCount,
     time: props.seconds,
     timeProgress,
     timeReverse: 0,
-    timeText: props.reverseCount ? secondsToHms(0) : secondsToHms(props.seconds),
-  }
+    timeText: props.reverseCount ? secondsToHms(0) : secondsToHms(props.seconds)
+  };
 }
 
-export default class TextTimeComponent extends React.Component<Default, Props, State> {
+export default class TextTimeComponent extends React.Component<
+  Default,
+  Props,
+  State
+> {
   static defaultProps = {
     active: true,
     isPausable: false,
     onTimeElapsed: () => null,
     seconds: 10,
     subTextStyle: null,
-    textStyle: null,
-  }
+    textStyle: null
+  };
 
   constructor(props: Props) {
-    super(props)
+    super(props);
     // this.isStarted = false;
-    this.state = getInitialStateText(props)
+    this.state = getInitialStateText(props);
   }
 
   componentDidMount = () => {
-    this.refreshTime()
-  }
+    this.refreshTime();
+  };
 
   componentDidUpdate(prevProps) {
-    const nextProps = this.props
+    const nextProps = this.props;
     if (prevProps !== nextProps) {
       if (nextProps.startAt > 0) {
         this.setState({
-          timeReverse: nextProps.startAt,
-        })
+          timeReverse: nextProps.startAt
+        });
       }
     }
   }
@@ -110,53 +114,62 @@ export default class TextTimeComponent extends React.Component<Default, Props, S
   // };
 
   componentWillUnmount = () => {
-    this.state.timeProgress.stopAnimation()
-  }
+    this.state.timeProgress.stopAnimation();
+  };
 
   refreshTime = () => {
     Animated.timing(this.state.timeProgress, {
       duration: 1000,
       easing: Easing.linear,
-      toValue: 100,
-    }).start(this.updateTime)
-  }
+      toValue: 100
+    }).start(this.updateTime);
+  };
 
   updateTime = () => {
-    const timeReverse = this.props.reverseCount ? this.state.timeReverse + 1 : 0
-    const time = this.props.reverseCount ? this.state.time + 1 : this.state.time - 1
-    const timeText = this.props.reverseCount ? secondsToHms(timeReverse) : secondsToHms(time)
-    const callback = time <= 0 ? this.props.onTimeElapsed : this.refreshTime
+    const timeReverse = this.props.reverseCount
+      ? this.state.timeReverse + 1
+      : 0;
+    const time = this.props.reverseCount
+      ? this.state.time + 1
+      : this.state.time - 1;
+    const timeText = this.props.reverseCount
+      ? secondsToHms(timeReverse)
+      : secondsToHms(time);
+    const callback = time <= 0 ? this.props.onTimeElapsed : this.refreshTime;
     this.setState(
       {
         ...getInitialStateText(this.props),
         time,
         timeReverse,
-        timeText,
+        timeText
       },
       callback
-    )
-  }
+    );
+  };
 
   renderSubText() {
-    const { active } = this.props
+    const { active } = this.props;
 
     if (this.props.isPausable) {
       return (
         <Text
           numberOfLines={1}
           ellipsizeMode="head"
-          style={[this.props.subTextStyle, active ? { opacity: 0.8 } : { opacity: 1 }]}
+          style={[
+            this.props.subTextStyle,
+            active ? { opacity: 0.8 } : { opacity: 1 }
+          ]}
         >
-          {active ? 'Pause' : 'Resume'}
+          {active ? "Pause" : "Resume"}
         </Text>
-      )
+      );
     }
 
-    return <View />
+    return <View />;
   }
 
   render() {
-    const { active } = this.props
+    const { active } = this.props;
 
     return (
       <View style={styles.textBase}>
@@ -166,13 +179,13 @@ export default class TextTimeComponent extends React.Component<Default, Props, S
           style={[
             this.props.textStyle,
             active ? { opacity: 1 } : { opacity: 0.8 },
-            { fontSize: 30 },
+            { fontSize: 30 }
           ]}
         >
           {this.state.timeText}
         </Text>
         {/* {this.renderSubText()} */}
       </View>
-    )
+    );
   }
 }
