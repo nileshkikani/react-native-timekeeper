@@ -1,12 +1,6 @@
 // @flow
-import * as React from 'react';
-import {
-  Animated,
-  Easing,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import * as React from 'react'
+import { Animated, Easing, StyleSheet, Text, View } from 'react-native'
 
 // const ViewPropTypesStyle = ViewPropTypes
 //   ? ViewPropTypes.style
@@ -19,7 +13,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
   },
-});
+})
 
 type Props = {
   active: boolean,
@@ -49,30 +43,31 @@ type State = {
   timeText: string,
   timeReverse: any,
   time: any,
-};
+}
 
 const secondsToHms = (rd: number): string => {
-  const d = Number(rd);
+  const d = Number(rd)
   // const h = Math.floor(d / 3600);
-  const m = Math.floor((d % 3600) / 60);
-  const s = Math.floor((d % 3600) % 60);
-
+  const h = Math.floor(d / 60 / 60)
+  const m = Math.floor((d / 60) % 60)
+  const s = Math.floor(d % 60)
   // const hDisplay = h > 0 ? h : '';
-  const mDisplay = m > 9 ? m : `0${m}`;
-  const sDisplay = s > 9 ? s : `0${s}`;
-  return `${mDisplay}:${sDisplay}`;
-};
+  const mDisplay = m > 9 ? m : `0${m}`
+  const sDisplay = s > 9 ? s : `0${s}`
+  const hDisplay = h > 9 ? h : `0${h}`
+  return `${hDisplay}:${mDisplay}:${sDisplay}`
+}
 
 export function getInitialStateText(props: Props): State {
-  const timeProgress = new Animated.Value(0);
+  const timeProgress = new Animated.Value(0)
   return {
-    timeProgress,
-    time: props.seconds,
-    timeReverse: 0,
-    timeText: (props.reverseCount) ? secondsToHms(0) : secondsToHms(props.seconds),
-    reverseCount: props.reverseCount,
     active: props.active,
-  };
+    reverseCount: props.reverseCount,
+    time: props.seconds,
+    timeProgress,
+    timeReverse: 0,
+    timeText: props.reverseCount ? secondsToHms(0) : secondsToHms(props.seconds),
+  }
 }
 
 export default class TextTimeComponent extends React.Component<Default, Props, State> {
@@ -86,89 +81,98 @@ export default class TextTimeComponent extends React.Component<Default, Props, S
   }
 
   constructor(props: Props) {
-    super(props);
+    super(props)
     // this.isStarted = false;
-    this.state = getInitialStateText(props);
-  }
-
-  state: State = {
-    ...getInitialStateText(this.props),
-    timeReverse: this.props.startAt,
+    this.state = getInitialStateText(props)
   }
 
   componentDidMount = () => {
-    this.refreshTime();
-    this.setState({
-      timeReverse: this.props.startAt,
-    });
-  };
+    this.refreshTime()
+  }
 
-  componentWillReceiveProps = (nextProps: Props) => {
-    if (nextProps.startAt > 0) {
-      this.state.timeReverse = nextProps.startAt;
-      this.setState({
-        timeReverse: nextProps.startAt,
-      });
+  componentDidUpdate(prevProps) {
+    const nextProps = this.props
+    if (prevProps !== nextProps) {
+      if (nextProps.startAt > 0) {
+        this.setState({
+          timeReverse: nextProps.startAt,
+        })
+      }
     }
-  };
+  }
+
+  // UNSAFE_componentWillReceiveProps = (nextProps: Props) => {
+  //   if (nextProps.startAt > 0) {
+  //     this.setState({
+  //       timeReverse: nextProps.startAt,
+  //     });
+  //   }
+  // };
 
   componentWillUnmount = () => {
-    this.state.timeProgress.stopAnimation();
-  };
+    this.state.timeProgress.stopAnimation()
+  }
 
   refreshTime = () => {
     Animated.timing(this.state.timeProgress, {
-      toValue: 100,
       duration: 1000,
       easing: Easing.linear,
-    }).start(this.updateTime);
+      toValue: 100,
+    }).start(this.updateTime)
   }
 
   updateTime = () => {
-    const timeReverse = (this.props.reverseCount)
-      ? this.state.timeReverse + 1
-      : 0;
-    const time = (this.props.reverseCount) ? this.state.time + 1 : this.state.time - 1;
-    const timeText = (this.props.reverseCount) ? secondsToHms(timeReverse) : secondsToHms(time);
-    const callback = (time <= 0) ? this.props.onTimeElapsed : this.refreshTime;
-    this.setState({
-      ...getInitialStateText(this.props),
-      time,
-      timeReverse,
-      timeText,
-    }, callback);
+    const timeReverse = this.props.reverseCount ? this.state.timeReverse + 1 : 0
+    const time = this.props.reverseCount ? this.state.time + 1 : this.state.time - 1
+    const timeText = this.props.reverseCount ? secondsToHms(timeReverse) : secondsToHms(time)
+    const callback = time <= 0 ? this.props.onTimeElapsed : this.refreshTime
+    this.setState(
+      {
+        ...getInitialStateText(this.props),
+        time,
+        timeReverse,
+        timeText,
+      },
+      callback
+    )
   }
 
   renderSubText() {
-    const { active } = this.props;
+    const { active } = this.props
 
     if (this.props.isPausable) {
       return (
         <Text
-          numberOfLines={1} ellipsizeMode="head"
+          numberOfLines={1}
+          ellipsizeMode="head"
           style={[this.props.subTextStyle, active ? { opacity: 0.8 } : { opacity: 1 }]}
         >
           {active ? 'Pause' : 'Resume'}
         </Text>
-      );
+      )
     }
 
-    return (<View />);
+    return <View />
   }
 
   render() {
-    const { active } = this.props;
+    const { active } = this.props
 
     return (
       <View style={styles.textBase}>
         <Text
-          numberOfLines={1} ellipsizeMode="head"
-          style={[this.props.textStyle, active ? { opacity: 1 } : { opacity: 0.8 }]}
+          numberOfLines={1}
+          ellipsizeMode="head"
+          style={[
+            this.props.textStyle,
+            active ? { opacity: 1 } : { opacity: 0.8 },
+            { fontSize: 30 },
+          ]}
         >
           {this.state.timeText}
         </Text>
-        {this.renderSubText()}
+        {/* {this.renderSubText()} */}
       </View>
-    );
+    )
   }
 }

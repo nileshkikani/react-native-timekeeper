@@ -1,34 +1,32 @@
 // @flow
-import {
-  StyleSheet,
-} from 'react-native';
+import { StyleSheet } from 'react-native'
 
 export default StyleSheet.create({
-  outerBeaterAnimation: {
+  halfCircle: {
+    backgroundColor: '#f00',
+    borderBottomRightRadius: 0,
+    borderTopRightRadius: 0,
     position: 'absolute',
-    left: 0,
     top: 0,
   },
-  outerCircle: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#e3e3e3',
-  },
   innerCircle: {
-    overflow: 'hidden',
-    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
+    justifyContent: 'center',
+    overflow: 'hidden',
   },
   leftWrap: {
     position: 'absolute',
     top: 0,
   },
-  halfCircle: {
+  outerBeaterAnimation: {
+    left: 0,
     position: 'absolute',
     top: 0,
-    borderTopRightRadius: 0,
-    borderBottomRightRadius: 0,
-    backgroundColor: '#f00',
   },
-});
+  outerCircle: {
+    alignItems: 'center',
+    backgroundColor: '#e3e3e3',
+    justifyContent: 'center',
+  },
+})
